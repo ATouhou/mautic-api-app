@@ -11,9 +11,9 @@ use Mautic\MauticApi;
 $settings = array(
     'baseUrl'      => 'http://localhost/mautic',
     'version'      => 'OAuth1a',
-    'clientKey'    => '4iuna559fd0ks0s4ckgko40kw4cwc8wso0ksoggkc4w4g4s4k',
-    'clientSecret' => '30xc05amfukgsokss04cgk8gwws84kk4ccg8soogo480s8w440', 
-    'callback'     => 'http://localhost/html/mautic-api-app'
+    'clientKey'    => '2z1txnfms8ysw0ogsooksw0o84048gw8cwo8ccsc80ss008sw4',
+    'clientSecret' => '55h90z8xolgk8ko4cgkskc4ccgg40c40gk4k0c4wwggcg8ossk', 
+    'callback'     => 'http://localhost/mautic-api-app'
 );
 
 // Initiate the auth object
@@ -65,9 +65,9 @@ if ($auth->validateAccessToken()) {
 	            // Creo un contacto
 	    echo 'creo un contacto';
         $data = array(
-			    'firstname' => 'Prueba 2',
+			    'firstname' => 'Prueba 3',
 			    'lastname'  => 'Contact',
-			    'email'     => 'jim@his-site.com',
+			    'email'     => 'prueba_3@example.com',
 			    'ipAddress' => '192.168.1.22'
 				);
 
