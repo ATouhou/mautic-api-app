@@ -5,7 +5,8 @@
   "description": "Mautic API Connector Library",
   "autoload": {
     "psr-4": {
-      "Mautic\\": "lib/"
+      "Mautic\\": "lib/",
+      "ANS\\": "src/"
     }
   },
   "autoload-dev": {
