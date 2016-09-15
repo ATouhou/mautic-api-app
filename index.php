@@ -7,6 +7,12 @@ require __DIR__ . '/vendor/autoload.php';
 use Mautic\Auth\ApiAuth;
 use Mautic\MauticApi;
 
+$access_token = getAccessToken();
+$access_token_secret = accessTokenSecret();
+
+var_dump($access_token);
+var_dump($access_token_secret);
+
 // ApiAuth::initiate will accept an array of OAuth settings
 $settings = array(
     'baseUrl'      => 'http://localhost/mautic',
@@ -16,71 +22,61 @@ $settings = array(
     'callback'     => 'http://localhost/html/mautic-api-app'
 );
 
-// Initiate the auth object
 $auth = ApiAuth::initiate($settings);
 
-
-if (!empty($_SESSION['access_token'])) {
+if (!empty($access_token) && !empty($access_token_secret)) {
 	//var_dump($_SESSION);
 	$accessToken = array();
-	$accessToken['access_token'] = $_SESSION['access_token'];
-	$accessToken['access_token_secret'] = $_SESSION['access_token_secret'];
-	$accessToken['expires'] = $_SESSION['expires'];
-	$accessToken['refresh_token'] = $_SESSION['refresh_token'];
+	$accessToken['access_token'] = $access_token;
+	$accessToken['access_token_secret'] = $access_token_secret;
+	$accessToken['expires'] = null;
+	$accessToken['refresh_token'] = null;
 	$auth->setAccessTokenDetails($accessToken);
 }
 
-$auth->enableDebugMode();
 
-//$auth->setAccessTokenDetails($_SESSION[$auth]);
 
 if ($auth->validateAccessToken()) {
-    if ($auth->accessTokenUpdated()) {
-        $accessTokenData = $auth->getAccessTokenData();
-        $_SESSION['access_token'] = $accessTokenData['access_token'];
-        $_SESSION['access_token_secret'] = $accessTokenData['access_token_secret'];
-        $_SESSION['expires'] = $accessTokenData['expires'];
-        $_SESSION['refresh_token'] = null;
+	echo 'El token está validado ';
+	if ($auth->accessTokenUpdated()) {
+		echo 'El token ha sido actualizado ';
+		$accessTokenData = $auth->getAccessTokenData();
+		saveToken($accessTokenData);
+	}
+	$apiUrl = 'http://localhost/mautic';
+  $contactApi = MauticApi::getContext("contacts", $auth, $apiUrl);
+  $contact = $contactApi->get(1);
+  var_dump($contact);
+  $data = array(
+    'firstname' => 'Prueba 6',
+    'lastname'  => 'Contact',
+    'email'     => 'jim@his-site6.com',
+    'ipAddress' => '192.168.1.122'
+	);
 
-        var_dump($accessTokenData);
-
-        //$auth = ApiAuth::initiate($settings);
-        $apiUrl = 'http://localhost/mautic';
-        $contactApi = MauticApi::getContext("contacts", $auth, $apiUrl);
-        var_dump($contactApi);
-        $contact = $contactApi->getOwners();
-        $contact = $contactApi->get(1);
-        var_dump($contact);
-
-        
-
-    } else {
-    	var_dump('ya está autorizada');
-    	$apiUrl = 'http://localhost/mautic';
-	    $contactApi = MauticApi::getContext("contacts", $auth, $apiUrl);
-	    var_dump($contactApi);
-	    $contact = $contactApi->getOwners();
-	    $contact = $contactApi->get(1);
-	    var_dump($contact);
-	            // Creo un contacto
-	    echo 'creo un contacto';
-        $data = array(
-			    'firstname' => 'Prueba 2',
-			    'lastname'  => 'Contact',
-			    'email'     => 'jim@his-site.com',
-			    'ipAddress' => '192.168.1.22'
-				);
-
-				var_dump($contact = $contactApi->create($data));
-    }
-
+	var_dump($contact = $contactApi->create($data));
+	
 } else {
-		echo 'no ha validado el acceso';
+	echo 'El token no está validado ';
 }
 
-//var_dump($auth->getDebugInfo());
 
 
-//$apiUrl = 'http://localhost/mautic';
-//$contactApi = MauticApi::getContext("contacts", $auth, $apiUrl);
+function saveToken($accessTokenData)
+{
+	$access_token = $accessTokenData['access_token'];
+	$access_token_secret = $accessTokenData['access_token_secret'];
+	file_put_contents('accessToken.txt', $access_token);
+	file_put_contents('accessTokenSecret.txt', $access_token_secret);
+}
 
+
+function getAccessToken()
+{
+	return file_get_contents('accessToken.txt');
+}
+
+function accessTokenSecret()
+{
+	return file_get_contents('accessTokenSecret.txt');
+}
